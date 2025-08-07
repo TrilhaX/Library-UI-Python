@@ -287,6 +287,19 @@ def maximize_window(window):
 def restore_window(window):
     window.state("normal")
 
+def sidebar(Parent, width=200, bg="lightgray", layout="pack", side="left", fill="y", **layout_opts):
+    sidebar_frame = tk.Frame(Parent, width=width, bg=bg)
+    sidebar_frame.pack_propagate(False)
+    
+    if layout == "pack":
+        if "side" not in layout_opts:
+            layout_opts["side"] = side
+        if "fill" not in layout_opts:
+            layout_opts["fill"] = fill
+
+    _apply_layout(sidebar_frame, layout, layout_opts)
+    return sidebar_frame
+
 
 # -------------------
 # Funções de manipulação

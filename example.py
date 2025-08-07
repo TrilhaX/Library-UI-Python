@@ -1,24 +1,24 @@
 import tkinter as tk
-import UI.library_ui as vui
+import UI.library_ui as vui  # your custom UI library
 
 def main():
-    # Create the main window using the custom UI library 'vui'
+    # Create the main window with custom parameters
     root = vui.Window(
-        UIName="Exemplo UI - VUI",  # Window title
-        Dimensions="760x480",       # Window size
-        ResizableX=True,            # Allow horizontal resizing
-        ResizableY=True,            # Allow vertical resizing
-        bgColor="#f7f7fb",          # Background color
-        topMost=False,              # Window not always on top
-        l=760,                     # Window width (redundant with Dimensions but kept for library)
-        a=480,                     # Window height
-        opacity=0.98,              # Window transparency (98% opaque)
+        UIName="Example UI - VUI",
+        Dimensions="760x480",
+        ResizableX=True,
+        ResizableY=True,
+        bgColor="#f7f7fb",
+        topMost=False,
+        l=760,
+        a=480,
+        opacity=0.98,
     )
 
-    # Add a label widget with custom font and colors
+    # Add a label with custom font and colors
     vui.Label(
         root,
-        "Exemplo de library - João",
+        "Example UI Library",
         fg="#222",
         bg="#f7f7fb",
         font=("Segoe UI", 16, "bold"),
@@ -26,112 +26,110 @@ def main():
 
     # Create an Entry widget for text input
     entry = vui.Entry(root, width=36)
-    # Create a button that prints the current Entry content when clicked
-    vui.Button(root, "Imprimir Entry", lambda: print("Entry:", vui.getValue(entry)))
+    # Button to print the current Entry content when clicked
+    vui.Button(root, "Print Entry", lambda: print("Entry:", vui.getValue(entry)))
 
     # Create a SpinBox widget with range 0 to 50, starting at 7
     spin = vui.SpinBox(root, from_=0, to=50, initial=7)
-    # Button to print the current value of the SpinBox
+    # Button to print the current SpinBox value
     vui.Button(
-        root, "Imprimir SpinBox", lambda: print("SpinBox:", vui.getSpinBoxValue(spin))
+        root, "Print SpinBox", lambda: print("SpinBox:", vui.getSpinBoxValue(spin))
     )
 
-    # Create a StringVar to hold the current option in OptionMenu
-    var_option = vui.StringVar(value="Opção A")
-    # Create an OptionMenu widget with three options
-    vui.OptionMenu(root, var_option, ["Opção A", "Opção B", "Opção C"])
-    # Button to print the currently selected option
+    # Create a StringVar for the OptionMenu selection
+    var_option = vui.StringVar(value="Option A")
+    # Create an OptionMenu with three options
+    vui.OptionMenu(root, var_option, ["Option A", "Option B", "Option C"])
+    # Button to print the selected OptionMenu value
     vui.Button(
         root,
-        "Imprimir OptionMenu",
+        "Print OptionMenu",
         lambda: print("OptionMenu:", vui.getOptionMenuValue(var_option)),
     )
 
     # Create a Combobox widget with three values
     cb = vui.Combobox(root, ["Alpha", "Beta", "Gamma"])
     # Button to print the selected Combobox value
-    vui.Button(root, "Imprimir Combobox (valor)", lambda: print("Combobox:", cb.get()))
+    vui.Button(root, "Print Combobox", lambda: print("Combobox:", cb.get()))
 
-    # Create a Text widget (multi-line text area)
+    # Create a multi-line Text widget
     text_area = vui.Text(root, width=50, height=6)
-    # Button to print the content of the Text widget
+    # Button to print the Text content
     vui.Button(
-        root, "Imprimir Text", lambda: print("Text:", repr(vui.getText(text_area)))
+        root, "Print Text", lambda: print("Text:", repr(vui.getText(text_area)))
     )
 
-    # Create a Progressbar widget with specified length
+    # Create a Progressbar widget
     pb = vui.Progressbar(root, length=220)
 
-    # Function to advance the progress bar value by 20, max 100
-    def avancar_pb():
+    # Function to advance the progress bar by 20, max 100
+    def advance_progressbar():
         current = pb["value"] if "value" in pb.keys() else 0
         pb["value"] = min(100, current + 20)
         print("Progressbar value:", pb["value"])
 
-    # Button to advance the progress bar when clicked
-    vui.Button(root, "Avançar Progressbar", avancar_pb)
+    # Button to advance the progress bar
+    vui.Button(root, "Advance Progressbar", advance_progressbar)
 
-    # Create a Treeview widget with two columns
-    tree = vui.Treeview(root, columns=("Nome", "Score"))
+    # Create a Treeview with two columns
+    tree = vui.Treeview(root, columns=("Name", "Score"))
     try:
-        # Insert sample data rows into the Treeview
-        tree.insert("", tk.END, values=("João", 1200))
-        tree.insert("", tk.END, values=("Ana", 900))
+        # Insert sample data into Treeview
+        tree.insert("", tk.END, values=("Alice", 1200))
+        tree.insert("", tk.END, values=("Bob", 900))
     except Exception:
         pass
 
-    # Function to print selected rows from the Treeview
-    def imprimir_tree_sel():
-        sel = tree.selection()
-        rows = [tree.item(i)["values"] for i in sel]
-        print("Treeview seleção:", rows)
+    # Function to print the selected rows from the Treeview
+    def print_tree_selection():
+        selected = tree.selection()
+        rows = [tree.item(i)["values"] for i in selected]
+        print("Treeview selection:", rows)
 
-    # Button to print the current selection in the Treeview
-    vui.Button(root, "Imprimir seleção Treeview", imprimir_tree_sel)
+    # Button to print Treeview selection
+    vui.Button(root, "Print Treeview Selection", print_tree_selection)
 
-    # Create a Canvas widget and add simple text
+    # Create a Canvas and add text
     canvas = vui.Canvas(root, width=200, height=100)
     canvas.create_text(100, 50, text="Canvas demo")
 
-    # Define example menu command functions
-    def abrir_exemplo():
-        print("Menu -> Abrir acionado")
+    # Example menu command functions
+    def open_example():
+        print("Menu -> Open selected")
 
-    def salvar_exemplo():
-        # Open a save file dialog and print selected path
+    def save_example():
         path = vui.ask_save_file(
-            defaultextension=".txt", filetypes=[("Texto", "*.txt")]
+            defaultextension=".txt", filetypes=[("Text Files", "*.txt")]
         )
-        print("Salvar -> caminho:", path)
+        print("Save -> path:", path)
 
-    # Define the menu structure for the menu bar
+    # Define menus structure
     menus = [
         (
-            "Arquivo",
+            "File",
             [
-                ("Abrir", abrir_exemplo),
-                ("Salvar", salvar_exemplo),
-                ("---", None),  # Separator in menu
-                ("Sair", root.quit),
+                ("Open", open_example),
+                ("Save", save_example),
+                ("---", None),  # separator
+                ("Exit", root.quit),
             ],
         ),
-        ("Ajuda", [("Sobre", lambda: print("Sobre..."))]),
+        ("Help", [("About", lambda: print("About selected"))]),
     ]
-    # Create the menu bar with the specified menus
+    # Create the menu bar
     vui.MenuDeBarra(root, menus, tearoff=False)
 
-    # Function to ask the user for their name using an input popup
-    def pedir_nome():
-        nome = vui.Popup("askstring", title="Seu nome", prompt="Digite seu nome:")
-        print("Popup askstring ->", nome)
+    # Popup example to ask user input
+    def ask_name():
+        name = vui.Popup("askstring", title="Your Name", prompt="Enter your name:")
+        print("Popup askstring ->", name)
 
-    # Button to show the name input popup
-    vui.Button(root, "Pedir nome (Popup)", pedir_nome)
+    vui.Button(root, "Ask Name (Popup)", ask_name)
 
     # Button to close the window
-    vui.Button(root, "Fechar", lambda: root.destroy())
+    vui.Button(root, "Close", lambda: root.destroy())
 
-    # Center the window on the screen after initial rendering
+    # Center the window on the screen
     try:
         root.update_idletasks()
         w = root.winfo_width()
@@ -144,7 +142,6 @@ def main():
     except Exception:
         pass
 
-    # Start the Tkinter event loop
     root.mainloop()
 
 
