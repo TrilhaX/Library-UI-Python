@@ -1,4 +1,4 @@
-# Trilha UI Library (Trilha\_ui)
+# Trilha UI Library
 
 A lightweight and easy-to-use Python UI library built on top of **Tkinter** and **ttk**.
 Provides a simplified interface to create windows, widgets, popups, menus, and manage layouts with less boilerplate code.
