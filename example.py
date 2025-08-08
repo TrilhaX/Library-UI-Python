@@ -1,149 +1,111 @@
 import tkinter as tk
-import UI.library_ui as vui  # your custom UI library
+from tkinter import ttk
+import UI.library_ui as vui  # sua UI library importada
 
 def main():
-    # Create the main window with custom parameters
     root = vui.Window(
-        UIName="Example UI - VUI",
-        Dimensions="760x480",
+        UIName="UI Library Demo - Complete",
+        Dimensions="1280x720",
         ResizableX=True,
         ResizableY=True,
-        bgColor="#f7f7fb",
+        bgColor="#f0f0f0",
+        opacity=1,
         topMost=False,
-        l=760,
-        a=480,
-        opacity=0.98,
+        fullscreen=True,
+        
     )
 
-    # Add a label with custom font and colors
-    vui.Label(
-        root,
-        "Example UI Library",
-        fg="#222",
-        bg="#f7f7fb",
-        font=("Segoe UI", 16, "bold"),
-    )
+    # Variables for some widgets
+    var_check = vui.BooleanVar(root, value=False)
+    var_radio = vui.StringVar(root, value="option1")
+    var_option = vui.StringVar(root, value="Option 1")
 
-    # Create an Entry widget for text input
-    entry = vui.Entry(root, width=36)
-    # Button to print the current Entry content when clicked
-    vui.Button(root, "Print Entry", lambda: print("Entry:", vui.getValue(entry)))
+    # Frame to hold inputs
+    input_frame = vui.Frame(root, bg="white")
+    input_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=False)
 
-    # Create a SpinBox widget with range 0 to 50, starting at 7
-    spin = vui.SpinBox(root, from_=0, to=50, initial=7)
-    # Button to print the current SpinBox value
-    vui.Button(
-        root, "Print SpinBox", lambda: print("SpinBox:", vui.getSpinBoxValue(spin))
-    )
+    # Create widgets WITHOUT pack, so we can grid them
+    lbl_name = vui.LabelNoPack(input_frame, text="Name:", fg="black", bg="white", font=("Arial", 12))
+    entry_name = vui.EntryNoPack(input_frame, width=30, bg="white", fg="black", font=("Arial", 12))
 
-    # Create a StringVar for the OptionMenu selection
-    var_option = vui.StringVar(value="Option A")
-    # Create an OptionMenu with three options
-    vui.OptionMenu(root, var_option, ["Option A", "Option B", "Option C"])
-    # Button to print the selected OptionMenu value
-    vui.Button(
-        root,
-        "Print OptionMenu",
-        lambda: print("OptionMenu:", vui.getOptionMenuValue(var_option)),
-    )
+    chk_subscribe = vui.CheckbuttonNoPack(input_frame, text="Subscribe to newsletter", variable=var_check, bg="white")
 
-    # Create a Combobox widget with three values
-    cb = vui.Combobox(root, ["Alpha", "Beta", "Gamma"])
-    # Button to print the selected Combobox value
-    vui.Button(root, "Print Combobox", lambda: print("Combobox:", cb.get()))
+    rb1 = vui.RadioButtonNoPack(input_frame, text="Option 1", variable=var_radio, value="option1", bg="white")
+    rb2 = vui.RadioButtonNoPack(input_frame, text="Option 2", variable=var_radio, value="option2", bg="white")
 
-    # Create a multi-line Text widget
-    text_area = vui.Text(root, width=50, height=6)
-    # Button to print the Text content
-    vui.Button(
-        root, "Print Text", lambda: print("Text:", repr(vui.getText(text_area)))
-    )
+    opt_menu = vui.OptionMenuNoPack(input_frame, var_option, ["Option 1", "Option 2", "Option 3"])
 
-    # Create a Progressbar widget
-    pb = vui.Progressbar(root, length=220)
+    spin_age = vui.SpinBoxNoPack(input_frame, from_=0, to=100)
+    spin_age.delete(0, tk.END)
+    spin_age.insert(0, "25")
 
-    # Function to advance the progress bar by 20, max 100
-    def advance_progressbar():
-        current = pb["value"] if "value" in pb.keys() else 0
-        pb["value"] = min(100, current + 20)
-        print("Progressbar value:", pb["value"])
+    txt_comments = vui.TextNoPack(input_frame, width=40, height=5)
 
-    # Button to advance the progress bar
-    vui.Button(root, "Advance Progressbar", advance_progressbar)
+    # Use grid for layout inside input_frame
+    lbl_name.grid(row=0, column=0, sticky="w", padx=5, pady=5)
+    entry_name.grid(row=0, column=1, sticky="w", padx=5, pady=5)
 
-    # Create a Treeview with two columns
-    tree = vui.Treeview(root, columns=("Name", "Score"))
-    try:
-        # Insert sample data into Treeview
-        tree.insert("", tk.END, values=("Alice", 1200))
-        tree.insert("", tk.END, values=("Bob", 900))
-    except Exception:
-        pass
+    chk_subscribe.grid(row=1, column=0, columnspan=2, sticky="w", padx=5, pady=5)
 
-    # Function to print the selected rows from the Treeview
-    def print_tree_selection():
-        selected = tree.selection()
-        rows = [tree.item(i)["values"] for i in selected]
-        print("Treeview selection:", rows)
+    rb1.grid(row=2, column=0, sticky="w", padx=5, pady=5)
+    rb2.grid(row=2, column=1, sticky="w", padx=5, pady=5)
 
-    # Button to print Treeview selection
-    vui.Button(root, "Print Treeview Selection", print_tree_selection)
+    opt_menu.grid(row=3, column=0, sticky="w", padx=5, pady=5)
+    spin_age.grid(row=3, column=1, sticky="w", padx=5, pady=5)
 
-    # Create a Canvas and add text
-    canvas = vui.Canvas(root, width=200, height=100)
-    canvas.create_text(100, 50, text="Canvas demo")
+    txt_comments.grid(row=4, column=0, columnspan=2, sticky="w", padx=5, pady=5)
 
-    # Example menu command functions
-    def open_example():
-        print("Menu -> Open selected")
+    # Dictionary of widgets and variables to save/load
+    widgets_to_save = {
+        "name": entry_name,
+        "subscribe": var_check,
+        "choice": var_radio,
+        "dropdown": var_option,
+        "age": spin_age,
+        "comments": txt_comments,
+    }
 
-    def save_example():
-        path = vui.ask_save_file(
-            defaultextension=".txt", filetypes=[("Text Files", "*.txt")]
-        )
-        print("Save -> path:", path)
+    # Log Text widget on bottom
+    log_text = vui.Text(root, width=100, height=15)
+    log_text.pack(side=tk.BOTTOM, fill=tk.X, padx=5, pady=5)
 
-    # Define menus structure
+    def save_data():
+        vui.save_all_widgets("UI/config/config.json", widgets_to_save, log_widget=log_text)
+        vui.Popup("info", title="Save", message="Data saved successfully!")
+
+    def load_data():
+        vui.load_all_widgets("UI/config/config.json", widgets_to_save, log_widget=log_text)
+        vui.Popup("info", title="Load", message="Data loaded successfully!")
+        
+    def clear_widgets():
+        vui.clear_fields(widgets_to_save)
+
+    # Buttons frame
+    buttons_frame = vui.Frame(root, bg="#ddd")
+    buttons_frame.pack(side=tk.TOP, fill=tk.X, pady=5)
+
+    btn_save = vui.Button(buttons_frame, text="Save Data", callback=save_data)
+    if vui.check_file_exists("UI/config/config.json"):
+        load_data()
+
+    btn_clear_fields = vui.Button(buttons_frame, text="Clear Fields", callback=clear_widgets)
+
+
+    # Menu bar with About and Exit
+    def on_about():
+        vui.Popup("info", title="About", message="UI Library Demo\nAuthor: Your Name")
+
+    def on_exit():
+        if vui.ask_yes_no(title="Exit", message="Do you really want to exit?"):
+            root.destroy()
+
     menus = [
-        (
-            "File",
-            [
-                ("Open", open_example),
-                ("Save", save_example),
-                ("---", None),  # separator
-                ("Exit", root.quit),
-            ],
-        ),
-        ("Help", [("About", lambda: print("About selected"))]),
+        ("File", [("Exit", on_exit)]),
+        ("Help", [("About", on_about)]),
     ]
-    # Create the menu bar
-    vui.MenuDeBarra(root, menus, tearoff=False)
-
-    # Popup example to ask user input
-    def ask_name():
-        name = vui.Popup("askstring", title="Your Name", prompt="Enter your name:")
-        print("Popup askstring ->", name)
-
-    vui.Button(root, "Ask Name (Popup)", ask_name)
-
-    # Button to close the window
-    vui.Button(root, "Close", lambda: root.destroy())
-
-    # Center the window on the screen
-    try:
-        root.update_idletasks()
-        w = root.winfo_width()
-        h = root.winfo_height()
-        sw = root.winfo_screenwidth()
-        sh = root.winfo_screenheight()
-        x = (sw - w) // 2
-        y = (sh - h) // 2
-        root.geometry(f"{w}x{h}+{x}+{y}")
-    except Exception:
-        pass
+    vui.MenuDeBarra(root, menus, tearoff=0)
 
     root.mainloop()
-
 
 if __name__ == "__main__":
     main()

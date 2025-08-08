@@ -1,8 +1,14 @@
 import tkinter as tk
+import json
 from tkinter import ttk
 from tkinter import PhotoImage
 from tkinter import messagebox, filedialog, colorchooser, simpledialog
+from pathlib import Path
+import json
 
+ConfigFolder = Path("./UI/config")
+DebugFolder = Path("./UI/debug")
+ImagesFolder = Path("./UI/images")
 
 # -------------------
 # Window
@@ -287,10 +293,19 @@ def maximize_window(window):
 def restore_window(window):
     window.state("normal")
 
-def sidebar(Parent, width=200, bg="lightgray", layout="pack", side="left", fill="y", **layout_opts):
+
+def sidebar(
+    Parent,
+    width=200,
+    bg="lightgray",
+    layout="pack",
+    side="left",
+    fill="y",
+    **layout_opts,
+):
     sidebar_frame = tk.Frame(Parent, width=width, bg=bg)
     sidebar_frame.pack_propagate(False)
-    
+
     if layout == "pack":
         if "side" not in layout_opts:
             layout_opts["side"] = side
@@ -299,6 +314,29 @@ def sidebar(Parent, width=200, bg="lightgray", layout="pack", side="left", fill=
 
     _apply_layout(sidebar_frame, layout, layout_opts)
     return sidebar_frame
+
+def LabelNoPack(Parent, **kwargs):
+    return tk.Label(Parent, **kwargs)
+
+def EntryNoPack(Parent, **kwargs):
+    return tk.Entry(Parent, **kwargs)
+
+def CheckbuttonNoPack(Parent, **kwargs):
+    return tk.Checkbutton(Parent, **kwargs)
+
+def RadioButtonNoPack(Parent, **kwargs):
+    return tk.Radiobutton(Parent, **kwargs)
+
+def OptionMenuNoPack(Parent, variable, options):
+    option_menu = tk.OptionMenu(Parent, variable, *options)
+    return option_menu
+
+def SpinBoxNoPack(Parent, **kwargs):
+    spinbox = tk.Spinbox(Parent, **kwargs)
+    return spinbox
+
+def TextNoPack(Parent, **kwargs):
+    return tk.Text(Parent, **kwargs)
 
 
 # -------------------
@@ -327,3 +365,175 @@ def getSpinBoxValue(Obj):
 
 def getOptionMenuValue(var):
     return var.get()
+
+
+# -------------------
+# Função de Salvar botões
+# -------------------
+
+def save_to_json(filename, data_dict):
+    with open(filename, "w") as f:
+        json.dump(data_dict, f, indent=4)
+
+
+def load_from_json(filename):
+    try:
+        with open(filename, "r") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}
+
+def logTXT(text_widget, message):
+    if text_widget:
+        try:
+            text_widget.insert(tk.END, message + "\n")
+            text_widget.see(tk.END)
+        except Exception:
+            pass
+    Filename = "./UI/debug/log.txt"
+
+def _log(message, log_widget=None):
+    logTXT(log_widget, message)
+
+def save_all_widgets(filename, widgets_dict, log_widget=None):
+    data = {}
+    _log(f"Saving widgets to {filename}...", log_widget)
+    for key, widget in widgets_dict.items():
+        try:
+            if isinstance(widget, tk.Entry):
+                data[key] = widget.get()
+            elif isinstance(widget, tk.Text):
+                data[key] = widget.get("1.0", tk.END).rstrip('\n')
+            elif isinstance(widget, ttk.Combobox):
+                data[key] = widget.get()
+            elif isinstance(widget, tk.Spinbox):
+                data[key] = widget.get()
+            elif isinstance(widget, (tk.IntVar, tk.StringVar, tk.BooleanVar, tk.DoubleVar)):
+                data[key] = widget.get()
+            else:
+                try:
+                    data[key] = widget.get()
+                except Exception:
+                    data[key] = None
+            _log(f"  [{key}] -> {data[key]!r}", log_widget)
+        except Exception as e:
+            _log(f"  Failed to read widget {key}: {e}", log_widget)
+    try:
+        with open(filename, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+        _log(f"Saved {len(data)} values to {filename}.", log_widget)
+    except Exception as e:
+        _log(f"Error saving file {filename}: {e}", log_widget)
+
+def load_all_widgets(filename, widgets_dict, log_widget=None):
+    _log(f"Loading widgets from {filename}...", log_widget)
+    try:
+        with open(filename, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        _log(f"File not found: {filename}", log_widget)
+        return
+    except Exception as e:
+        _log(f"Error reading {filename}: {e}", log_widget)
+        return
+
+    for key, widget in widgets_dict.items():
+        if key not in data:
+            _log(f"Key {key} not in saved data, skipping.", log_widget)
+            continue
+
+        value = data[key]
+        _log(f"\nKey: {key}", log_widget)
+        _log(f"  Widget type: {type(widget)}", log_widget)
+        _log(f"  Saved value (from file): {value!r}", log_widget)
+
+        # Combobox first (ttk.Combobox subclasses Entry)
+        if isinstance(widget, ttk.Combobox):
+            _log("  Matched: ttk.Combobox", log_widget)
+            try:
+                combo_values = widget.cget('values')
+            except Exception:
+                combo_values = widget['values']
+            _log(f"  Combobox values: {combo_values!r}", log_widget)
+
+            try:
+                values_list = list(combo_values)
+            except Exception:
+                try:
+                    values_list = list(widget['values'])
+                except Exception:
+                    values_list = []
+
+            if value in values_list:
+                index = values_list.index(value)
+                _log(f"  Value found in combobox values at index {index}, calling current({index})", log_widget)
+                try:
+                    widget.current(index)
+                except Exception as e:
+                    _log(f"  widget.current failed: {e} -> trying widget.set(value)", log_widget)
+                    widget.set(value)
+            else:
+                _log("  Value NOT found in combobox values, calling set(value) to show it anyway", log_widget)
+                try:
+                    widget.set(value)
+                except Exception as e:
+                    _log(f"  widget.set failed: {e}", log_widget)
+
+        elif isinstance(widget, tk.Entry):
+            _log("  Matched: tk.Entry", log_widget)
+            try:
+                widget.delete(0, tk.END)
+                widget.insert(0, value)
+            except Exception as e:
+                _log(f"  Failed to set Entry: {e}", log_widget)
+
+        elif isinstance(widget, tk.Text):
+            _log("  Matched: tk.Text", log_widget)
+            try:
+                widget.delete("1.0", tk.END)
+                widget.insert("1.0", value)
+            except Exception as e:
+                _log(f"  Failed to set Text: {e}", log_widget)
+
+        elif isinstance(widget, tk.Spinbox):
+            _log("  Matched: tk.Spinbox", log_widget)
+            try:
+                widget.delete(0, tk.END)
+                widget.insert(0, value)
+            except Exception as e:
+                _log(f"  Failed to set Spinbox: {e}", log_widget)
+
+        elif isinstance(widget, (tk.IntVar, tk.StringVar, tk.BooleanVar, tk.DoubleVar)):
+            _log("  Matched: Variable (IntVar/StringVar/BooleanVar/DoubleVar)", log_widget)
+            try:
+                widget.set(value)
+            except Exception as e:
+                _log(f"  Failed to set Variable: {e}", log_widget)
+
+        else:
+            _log("  No exact match, trying generic widget.set(value)", log_widget)
+            try:
+                widget.set(value)
+                _log("  generic set succeeded", log_widget)
+            except Exception as e:
+                _log(f"  generic set failed: {e}", log_widget)
+
+def clear_fields(widgets_dict):
+    for widget in widgets_dict.values():
+        if isinstance(widget, tk.Entry):
+            widget.delete(0, tk.END)
+        elif isinstance(widget, tk.BooleanVar):
+            widget.set(False)
+        elif isinstance(widget, tk.StringVar):
+            widget.set("")
+        elif isinstance(widget, tk.Spinbox):
+            widget.delete(0, tk.END)
+            widget.insert(0, "0")
+        elif isinstance(widget, tk.Text):
+            widget.delete("1.0", tk.END)
+    Popup("info", title="Clear", message="Fields cleared!")
+    
+def check_file_exists(file):
+    filename = file
+    if Path(filename).exists():
+        return True
