@@ -5,15 +5,15 @@ import UI.library_ui as vui
 def main():
     root = vui.Window(
         UIName="UI Library Demo - Complete",
-        Dimensions="1920x1080",
+        Dimensions="1280x720",
         ResizableX=True,
         ResizableY=True,
         bgColor="#f0f0f0",
         opacity=1,
-        topMost=False,
+        topMost=True,
         fullscreen=False,
-        l = 1920,
-        a = 1080
+        lMax=1920,
+        aMax=1080,
     )
 
     vui.sidebar(root, width=69, bg="#437")

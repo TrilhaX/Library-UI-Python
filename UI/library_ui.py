@@ -22,8 +22,10 @@ def Window(
     bgColor="white",
     fullscreen=False,
     topMost=False,
-    l=200,
-    a=200,
+    lMin=200,
+    aMin=200,
+    lMax=1920,
+    aMax=720,
     borderTransparent=False,
     bgTransparent=False,
     opacity=1.0,
@@ -38,8 +40,8 @@ def Window(
     root.attributes("-fullscreen", fullscreen)
     root.attributes("-topmost", topMost)
     root.attributes("-alpha", opacity)
-    root.minsize(l, a)
-    root.maxsize(l, a)
+    root.minsize(lMin, aMin)
+    root.maxsize(lMax, aMax)
     root.overrideredirect(borderTransparent)
     if bgTransparent:
         root.wm_attributes("-transparentcolor", bgColor)
