@@ -1,20 +1,24 @@
 import tkinter as tk
 from tkinter import ttk
-import UI.library_ui as vui  # sua UI library importada
+import UI.library_ui as vui
 
 def main():
     root = vui.Window(
         UIName="UI Library Demo - Complete",
-        Dimensions="1280x720",
+        Dimensions="1920x1080",
         ResizableX=True,
         ResizableY=True,
         bgColor="#f0f0f0",
         opacity=1,
         topMost=False,
-        fullscreen=True,
-        
+        fullscreen=False,
+        l = 1920,
+        a = 1080
     )
 
+    vui.sidebar(root, width=69, bg="#437")
+    vui.sidebar(root, width=69, bg="#437", side="right")
+    
     # Variables for some widgets
     var_check = vui.BooleanVar(root, value=False)
     var_radio = vui.StringVar(root, value="option1")

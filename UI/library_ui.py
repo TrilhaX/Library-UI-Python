@@ -15,7 +15,7 @@ ImagesFolder = Path("./UI/images")
 # -------------------
 def Window(
     UIName="Janela",
-    Dimensions="800x600",
+    Dimensions="1280x720",
     ResizableX=True,
     ResizableY=True,
     iconPath=None,
